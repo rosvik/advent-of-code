@@ -7,14 +7,16 @@ fn main() {
         let mut sum = 0;
         for line in lines {
             let line = line.unwrap();
+            println!("{}", line);
 
             // "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"
-            // only 12 red cubes, 13 green cubes, and 14 blue cubes
             let game_num = get_game_num(&line);
 
             let picks: Vec<&str> = line.split(':').nth(1).unwrap().split(';').collect();
 
-            let mut is_valid = true;
+            let mut max_red = 0;
+            let mut max_green = 0;
+            let mut max_blue = 0;
 
             for pick in picks {
                 let cubes: Vec<&str> = pick.split(',').collect();
@@ -34,21 +36,20 @@ fn main() {
                     }
                 }
 
-                println!(
-                    "{}, Red: {}, Green: {}, Blue: {}",
-                    game_num, red, green, blue
-                );
-
-                if red > 12 || green > 13 || blue > 14 {
-                    println!("Invalid game: {}", game_num);
-                    is_valid = false;
-                    break;
+                if red > max_red {
+                    max_red = red;
+                }
+                if green > max_green {
+                    max_green = green;
+                }
+                if blue > max_blue {
+                    max_blue = blue;
                 }
             }
 
-            if is_valid {
-                sum += game_num;
-            }
+            println!("Game {}: {} {} {}", game_num, max_red, max_green, max_blue);
+
+            sum += max_red * max_green * max_blue;
         }
         println!("SUM: {}", sum);
     }
