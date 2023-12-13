@@ -10,6 +10,10 @@ use std::path::Path;
 // Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 
 fn main() {
+    solve_day_1();
+}
+
+fn solve_day_1() {
     if let Ok(lines) = read_lines("./input") {
         let mut sum = 0;
         for line in lines {
