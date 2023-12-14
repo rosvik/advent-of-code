@@ -10,47 +10,57 @@ use std::path::Path;
 // Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 
 fn main() {
-    solve_day_1();
-}
-
-fn solve_day_1() {
     if let Ok(lines) = read_lines("./input") {
-        let mut sum = 0;
+        // Find number of wins for each card
+
+        // (card_score, number_of_occurances)
+        let mut scores: Vec<u32> = Vec::new();
+        let mut occurances: Vec<u32> = Vec::new();
         for line in lines {
             let line = line.unwrap();
-            let number_part = line.split(": ").last().unwrap();
-
-            let winning_part = number_part.split(" | ").next().unwrap();
-            let your_part = number_part.split(" | ").last().unwrap();
-
-            let winning_part: Vec<u32> = winning_part
-                .split(' ')
-                .map(|x| x.trim().parse::<u32>().unwrap_or(0))
-                .collect();
-
-            let your_part: Vec<u32> = your_part
-                .split_whitespace()
-                .map(|x| x.trim().parse::<u32>().unwrap_or(0))
-                .collect();
-
-            let mut card_score: u32 = 0;
-            winning_part.iter().for_each(|i| {
-                your_part.iter().for_each(|j| {
-                    if i == j {
-                        if card_score == 0 {
-                            card_score = 1;
-                        } else {
-                            card_score *= 2;
-                        }
-                    }
-                });
-            });
-            println!("{:?} | {:?} -> {}", winning_part, your_part, card_score);
-
-            sum += card_score;
+            let card_score = find_number_of_wins(line);
+            scores.push(card_score);
+            occurances.push(1);
         }
-        println!("SUM: {}", sum);
+
+        // Add [number_of_occurences] to the next [card_score] rows.
+        for (i, card_score) in scores.iter().enumerate() {
+            println!("{:?}", card_score);
+            for x in i + 1..=i + *card_score as usize {
+                occurances[x] += occurances[i];
+            }
+        }
+
+        let sum: u32 = occurances.iter().sum();
+        println!("{:?}", sum);
     }
+}
+
+fn find_number_of_wins(line: String) -> u32 {
+    let number_part = line.split(": ").last().unwrap();
+    let winning_part = number_part.split(" | ").next().unwrap();
+    let your_part = number_part.split(" | ").last().unwrap();
+    let winning_part: Vec<u32> = winning_part
+        .split(' ')
+        .map(|x| x.trim().parse::<u32>().unwrap_or(0))
+        .collect();
+
+    let your_part: Vec<u32> = your_part
+        .split_whitespace()
+        .map(|x| x.trim().parse::<u32>().unwrap_or(0))
+        .collect();
+
+    let mut card_score: u32 = 0;
+
+    winning_part.iter().for_each(|i| {
+        your_part.iter().for_each(|j| {
+            if i == j {
+                card_score += 1;
+            }
+        });
+    });
+
+    card_score
 }
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
