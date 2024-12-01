@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
@@ -22,18 +23,19 @@ fn main() -> io::Result<()> {
         right_list.push(numbers[1]);
     }
 
-    // Sort both lists to pair smallest with smallest
-    left_list.sort();
-    right_list.sort();
+    // Count occurrences in right list
+    let mut right_counts: HashMap<i64, i64> = HashMap::new();
+    for &num in &right_list {
+        *right_counts.entry(num).or_insert(0) += 1;
+    }
 
-    // Calculate total distance
-    let total_distance: i64 = left_list
+    // Calculate similarity score
+    let similarity_score: i64 = left_list
         .iter()
-        .zip(right_list.iter())
-        .map(|(a, b)| (a - b).abs())
+        .map(|&num| num * right_counts.get(&num).unwrap_or(&0))
         .sum();
 
-    println!("Total distance between lists: {}", total_distance);
+    println!("Similarity score: {}", similarity_score);
 
     Ok(())
 }
